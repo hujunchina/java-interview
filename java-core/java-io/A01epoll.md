@@ -26,7 +26,7 @@
 
 一般而言，由硬件产生的信号需要 CPU 立马做出回应，不然数据可能就丢失了，所以它的优先级很高。CPU 理应中断掉正在执行的程序，去做出响应；当 CPU 完成对硬件的响应后，再重新执行用户程序。中断的过程如下图，它和函数调用差不多，只不过函数调用是事先定好位置，而中断的位置由“信号”决定。
 
-![image-20200510221049707](..\..\img\epoll-interapter)
+![image-20200510221049707](../../img/epoll-interapter)
 
 
 
@@ -72,7 +72,7 @@ printf(...)
 
 下图的计算机中运行着 A、B 与 C 三个进程，其中进程 A 执行着上述基础网络程序，一开始，这 3 个进程都被操作系统的工作队列所引用，处于运行状态，会分时执行。
 
-![image-20200510221201580](..\..\img\epll-bloking)
+![image-20200510221201580](../../img/epll-bloking)
 
 
 
@@ -80,11 +80,11 @@ printf(...)
 
 当进程 A 执行到创建 socket 的语句时，操作系统会创建一个由文件系统管理的 socket 对象（如下图）。这个 socket 对象包含了发送缓冲区、接收缓冲区与等待队列等成员。等待队列是个非常重要的结构，它指向所有需要等待该 socket 事件的进程。
 
-![image-20200510222550129](..\..\img\epoll-waiting)
+![image-20200510222550129](../../img/epoll-waiting)
 
 当程序执行到 recv 时，操作系统会将进程 A 从工作队列移动到**该 socket 的等待队列**中（如下图）。由于工作队列只剩下了进程 B 和 C，依据进程调度，CPU 会轮流执行这两个进程的程序，不会执行进程 A 的程序。所以进程 A 被阻塞，不会往下执行代码，也不会占用 CPU 资源。
 
-![image-20200510222716815](..\..\img\epoll-waiting2)
+![image-20200510222716815](../../img/epoll-waiting2)
 
 
 
@@ -104,11 +104,11 @@ printf(...)
 
 此处的中断程序主要有两项功能，先将网络数据写入到对应 socket 的接收缓冲区里面（步骤④），再唤醒进程 A（步骤⑤），重新将进程 A 放入工作队列中。
 
-![image-20200510222818486](..\..\img\epoll-work-circle)
+![image-20200510222818486](../../img/epoll-work-circle)
 
 唤醒进程的过程如下图所示：
 
-![image-20200510222903520](..\..\img\epoll-work-circle2)
+![image-20200510222903520](../../img/epoll-work-circle2)
 
 以上是内核接收数据全过程，这里我们可能会思考两个问题：
 
@@ -150,7 +150,7 @@ while(1){
 
 select 的实现思路很直接，假如程序同时监视如下图的 sock1、sock2 和 sock3 三个 socket，那么在调用 select 之后，操作系统把进程 A 分别加入这三个 socket 的等待队列中。
 
-![image-20200510223233186](..\..\img\epoll-selector.png)
+![image-20200510223233186](../../img/epoll-selector.png)
 
 操作系统把进程 A 分别加入这三个 socket 的等待队列中
 
@@ -158,11 +158,11 @@ select 的实现思路很直接，假如程序同时监视如下图的 sock1、s
 
 注：recv 和 select 的中断回调可以设置成不同的内容。
 
-![image-20200510223322457](..\..\img\epoll-selector2.png)
+![image-20200510223322457](../../img/epoll-selector2.png)
 
 sock2 接收到了数据，中断程序唤起进程 A。所谓唤起进程，就是将进程从所有的等待队列中移除，加入到工作队列里面，如下图所示：
 
-![image-20200510223402852](..\..\img\epoll-selector3.png)
+![image-20200510223402852](../../img/epoll-selector3.png)
 
 将进程 A 从所有等待队列中移除，再加入到工作队列里面。
 
@@ -188,7 +188,7 @@ epoll 是在 select 出现 N 多年后才被发明的，是 select 和 poll（po
 
 select 低效的原因之一是将“维护等待队列”和“阻塞进程”两个步骤合二为一。如下图所示，每次调用 select 都需要这两步操作，然而大多数应用场景中，需要监视的 socket 相对固定，并不需要每次都修改。epoll 将这两个操作分开，先用 epoll_ctl 维护等待队列，再调用 epoll_wait 阻塞进程。显而易见地，效率就能得到提升。
 
-![image-20200510223503717](C:\code\github\java-interview\img\epoll-epoll.png)
+![image-20200510223503717](C:/code/github/java-interview/img/epoll-epoll.png)
 
 相比 select，epoll 拆分了功能。
 
@@ -217,7 +217,7 @@ while(1){
 
 select 低效的另一个原因在于程序不知道哪些 socket 收到数据，只能一个个遍历。如果内核维护一个“就绪列表”，引用收到数据的 socket，就能避免遍历。如下图所示，计算机共有三个 socket，收到数据的 sock2 和 sock3 被就绪列表 rdlist 所引用。当进程被唤醒后，只要获取 rdlist 的内容，就能够知道哪些 socket 收到数据。
 
-![image-20200510223731855](..\..\img\epoll-epoll2.png)
+![image-20200510223731855](../../img/epoll-epoll2.png)
 
 ### 七、epoll 的原理与工作流程
 
@@ -227,7 +227,7 @@ select 低效的另一个原因在于程序不知道哪些 socket 收到数据�
 
 如下图所示，当某个进程调用 epoll_create 方法时，内核会创建一个 eventpoll 对象（也就是程序中 epfd 所代表的对象）。eventpoll 对象也是文件系统中的一员，和 socket 一样，它也会有等待队列。
 
-![image-20200510223820850](..\..\img\epoll-epoll3.png)
+![image-20200510223820850](../../img/epoll-epoll3.png)
 
 创建一个代表该 epoll 的 eventpoll 对象是必须的，因为内核要维护“就绪列表”等数据，“就绪列表”可以作为 eventpoll 的成员。
 
@@ -235,7 +235,7 @@ select 低效的另一个原因在于程序不知道哪些 socket 收到数据�
 
 创建 epoll 对象后，可以用 epoll_ctl 添加或删除所要监听的 socket。以添加 socket 为例，如下图，如果通过 epoll_ctl 添加 sock1、sock2 和 sock3 的监视，内核会将 eventpoll 添加到这三个 socket 的等待队列中。
 
-![image-20200510223902287](..\..\img\epoll-epoll4.png)
+![image-20200510223902287](../../img/epoll-epoll4.png)
 
 当 socket 收到数据后，中断程序会操作 eventpoll 对象，而不是直接操作进程。
 
@@ -243,7 +243,7 @@ select 低效的另一个原因在于程序不知道哪些 socket 收到数据�
 
 当 socket 收到数据后，中断程序会给 eventpoll 的“就绪列表”添加 socket 引用。如下图展示的是 sock2 和 sock3 收到数据后，中断程序让 rdlist 引用这两个 socket。
 
-![image-20200510223939214](..\..\img\epoll-epoll5.png)
+![image-20200510223939214](../../img/epoll-epoll5.png)
 
 eventpoll 对象相当于 socket 和进程之间的中介，socket 的数据接收并不直接影响进程，而是通过改变 eventpoll 的就绪列表来改变进程状态。
 
@@ -253,11 +253,11 @@ eventpoll 对象相当于 socket 和进程之间的中介，socket 的数据接�
 
 假设计算机中正在运行进程 A 和进程 B，在某时刻进程 A 运行到了 epoll_wait 语句。如下图所示，内核会将进程 A 放入 eventpoll 的等待队列中，阻塞进程。
 
-![image-20200510224015236](..\..\img\epoll-epoll6.png)
+![image-20200510224015236](../../img/epoll-epoll6.png)
 
 当 socket 接收到数据，中断程序一方面修改 rdlist，另一方面唤醒 eventpoll 等待队列中的进程，进程 A 再次进入运行状态（如下图）。也因为 rdlist 的存在，进程 A 可以知道哪些 socket 发生了变化。
 
-![image-20200510224045584](..\..\img\epoll-epoll7.png)
+![image-20200510224045584](../../img/epoll-epoll7.png)
 
 ### 八、epoll 的实现细节
 
@@ -267,7 +267,7 @@ eventpoll 对象相当于 socket 和进程之间的中介，socket 的数据接�
 
 eventpoll 包含了 lock、mtx、wq（等待队列）与 rdlist 等成员，其中 rdlist 和 rbr 是我们所关心的。
 
-![image-20200510224133461](..\..\img\epoll-detail.png)
+![image-20200510224133461](../../img/epoll-detail.png)
 
 epoll 原理示意图，图片来源：《深入理解Nginx：模块开发与架构解析(第二版)》，陶辉
 
