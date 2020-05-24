@@ -88,6 +88,10 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 
 从上面可以看出，本质上CAS使用了自旋锁进行自旋，直到CAS操作成功，如果很长一段时间都没有操作成功，那么将一直自旋下去。
 
+#### 2.3 Unsafe类
+
+无法使用，底层为私有构造方法；提供了compareAndSet方法；直接操作内存，分配内存等；直接对类进行分配内存实例化，不是new。
+
 ### 3. CAS 总结
 
 ```java

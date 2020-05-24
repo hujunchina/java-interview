@@ -6,6 +6,8 @@
 2. ThreadLocal 原理
 3. ThreadLocal 总结
 
+[TOC]
+
 ### 1. ThreadLocal 是什么
 
 #### 1.1 note
