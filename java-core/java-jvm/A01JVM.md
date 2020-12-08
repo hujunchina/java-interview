@@ -50,15 +50,15 @@ JVM有两个性能指标：
 - 对新生对象内存分配
    	1. 内存绝对规整：Bump the pointer 指针碰撞，仅仅把内存分界指针挪动一段与对象大小相同的距离，分配空间
       	2. 内存不规整：Free List，通过空闲列表找到足够大的内存空间
-         	3. 将内存空间初始化为0
+              	3. 将内存空间初始化为0
             	4. JVM对对象设置
-       有哪些实例
-       元数据信息
-       对象hashcode
-       对象GC分代年龄等
+             有哪些实例
+             元数据信息
+             对象hashcode
+             对象GC分代年龄等
       	5. GC收集器的内存分配算法
-       Serial、ParNew（带Compact过程的收集器）-》指针碰撞
-       CMS（基于Mark-Sweep）-》Free List
+          Serial、ParNew（带Compact过程的收集器）-》指针碰撞
+          CMS（基于Mark-Sweep）-》Free List
 
 - 对象内存分布
   - 对象头（对象自身的运行时数据（Mark Word））：哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳。该部分数据被设计成1个 非固定的数据结构 以便在极小的空间存储尽量多的信息（会根据对象状态复用存储空间）
@@ -351,3 +351,4 @@ class Test{
 2. `Bootstrap Classloader` 负责加载 `ExtClassLoader`，并且将 `ExtClassLoader`的父加载器设置为 `Bootstrap Classloader`
 3. `Bootstrap Classloader` 加载完 `ExtClassLoader` 后，就会加载 `AppClassLoader`，并且将 `AppClassLoader` 的父加载器指定为 `ExtClassLoader`。
    ![image-20200522123204593](C:\code\github\java-interview\img\jvm-13.png)
+

@@ -46,8 +46,8 @@ Cache line：为了高效的存取缓存，不是简单地随意地将单条数�
 ### 1.2.4 Cache 策略:
 
    				1. CPU通过cache间接访问主存，不直接访问
-   				2. 遍历一遍全部cache line，主存地址是否在其中
-   				3. 如果未找到，新建一个entry把line写入，再读取到CPU中
+      				2. 遍历一遍全部cache line，主存地址是否在其中
+         				3. 如果未找到，新建一个entry把line写入，再读取到CPU中
 
 ### False Sharing:
 
@@ -72,3 +72,4 @@ Cache line：为了高效的存取缓存，不是简单地随意地将单条数�
 4. 查看某个进程中的线程
   1. ps -T -p  pid
   2. top -H  -p  pid
+  13. ps -ef ｜ grep java
